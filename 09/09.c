@@ -5,8 +5,8 @@
 #define HISTORYLEN 21
 #define NUMLINES 200
 
-int predict_pt1(int l[], int length);
-int predict_pt2(int l[], int length);
+int predict(int l[], int length);
+int predict_backwards(int l[], int length);
 int zeroes(int list[], int length);
 void* parseinput(char* filename);
 void readlist(char* str, int* list);
@@ -16,36 +16,32 @@ int main()
     int (*history)[HISTORYLEN] = parseinput("input");
     int part1 = 0, part2 = 0;
     for (int h=0; h<NUMLINES; ++h) {
-        part1 += predict_pt1(history[h], HISTORYLEN);
-        part2 += predict_pt2(history[h], HISTORYLEN);
+        part1 += predict(history[h], HISTORYLEN);
+        part2 += predict_backwards(history[h], HISTORYLEN);
     }
     printf("Part 1: %i\nPart 2: %i\n", part1, part2);
     assert(part1 == 1772145754);
     assert(part2 == 867);
 }
 
-int predict_pt1(int l[], int length)
+int predict(int l[], int length)
 {
     if (zeroes(l, length))
         return 0;
-    int* tmp = malloc((length-1) * sizeof (int));
+    int tmp[HISTORYLEN];
     for (int i=0; i<length-1; ++i)
         tmp[i] = l[i+1] - l[i];
-    int result = l[length-1] + predict_pt1(tmp, length-1);
-    free(tmp);
-    return result;
+    return l[length-1] + predict(tmp, length-1);
 }
 
-int predict_pt2(int l[], int length)
+int predict_backwards(int l[], int length)
 {
     if (zeroes(l, length))
         return 0;
-    int* tmp = malloc((length-1) * sizeof (int));
+    int tmp[HISTORYLEN];
     for (int i=0; i<length-1; ++i)
         tmp[i] = l[i+1] - l[i];
-    int result = l[0] - predict_pt2(tmp, length-1);
-    free(tmp);
-    return result;
+    return l[0] - predict_backwards(tmp, length-1);
 }
 
 int zeroes(int list[], int length)
